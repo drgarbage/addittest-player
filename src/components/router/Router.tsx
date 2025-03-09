@@ -1,6 +1,7 @@
 import { Dialog } from '@headlessui/react';
 import { lazy, Suspense, useState } from 'react';
-import { Outlet, RouteObject, useRoutes, BrowserRouter } from 'react-router-dom';
+import { Outlet, RouteObject, useRoutes, BrowserRouter, Routes, Route } from 'react-router-dom';
+import Player from '../screens/player';
 
 const Loading = () => <p className="p-4 w-full h-full text-center">Loading...</p>;
 
@@ -18,10 +19,16 @@ function Layout() {
   );
 }
 
-export const Router = () => {
+export const Router: React.FC = () => {
   return (
     <BrowserRouter>
-      <InnerRouter />
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<IndexScreen />} />
+          <Route path="*" element={<Page404Screen />} />
+        </Route>
+        <Route path="/player/:key" element={<Player />} />
+      </Routes>
     </BrowserRouter>
   );
 };

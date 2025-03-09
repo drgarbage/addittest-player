@@ -2,6 +2,7 @@ import { FirebaseApp, initializeApp } from 'firebase/app';
 import { getAuth, Auth, connectAuthEmulator } from 'firebase/auth';
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 import { connectStorageEmulator, getStorage } from "firebase/storage";
+import { connectDatabaseEmulator, getDatabase } from 'firebase/database';
 
 let firebaseApp: FirebaseApp;
 const useEmulator = () => import.meta.env.VITE_USE_FIREBASE_EMULATOR;
@@ -25,6 +26,7 @@ export const setupFirebase = () => {
 let auth: Auth;
 let firestore: ReturnType<typeof getFirestore>;
 let storage: ReturnType<typeof getStorage>;
+let database: ReturnType<typeof getDatabase>;
 
 export const useAuth = () => {
   auth = getAuth(firebaseApp);
@@ -52,4 +54,14 @@ export const useStorage = () => {
     }
   }
   return storage;
+};
+
+export const useDatabase = () => {
+  if (!database) {
+    database = getDatabase();
+    if (useEmulator()) {
+      connectDatabaseEmulator(database, 'localhost', 9000);
+    }
+  }
+  return database;
 };

@@ -27,7 +27,7 @@ export const Router: React.FC = () => {
           <Route index element={<IndexScreen />} />
           <Route path="*" element={<Page404Screen />} />
         </Route>
-        <Route path="/player/:key" element={<Player />} />
+        <Route path="/player" element={<Player />} />
       </Routes>
     </BrowserRouter>
   );

@@ -67,6 +67,9 @@ function Index() {
               {state.state === 'UNKNOWN' ? null : state.state === 'SIGNED_OUT' ? <SignInButton /> : <SignOutButton />}
               <button onClick={() => setIsOpen(true)}>Display Dialog</button>
             </div>
+            <div className='mt-4'>
+              <a className="link link-primary" href="https://f09f-39-1-9-107.ngrok-free.app">HTTPS</a>
+            </div>
           </div>
         </div>
       </div>

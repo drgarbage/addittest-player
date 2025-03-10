@@ -6,3 +6,5 @@ dist-ssr
 public/videos
 *.pem
 *.cache
+.env.local
+cert

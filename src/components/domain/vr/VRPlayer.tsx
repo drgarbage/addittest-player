@@ -2,10 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ref, onValue, set, Unsubscribe, DatabaseReference, update } from 'firebase/database';
 import { useDatabase } from '~/lib/firebase';
 import { SHA256 } from 'crypto-js';
-
+// const VIDEO_URL = "https://firebasestorage.googleapis.com/v0/b/dating-app-f1df6.appspot.com/o/drug.mp4?alt=media";
+const VIDEO_URL = "/videos/drug/drug.m3u8";
 const VideoTypes = [
   {
-    "name": "VR 360 (2D)",
+    "name": "VR 360 (2D) 柱狀",
+    "method": "createCylinderLayer",
     "config": {
       "centralAngle": Math.PI * 2,
       "aspectRatio": 2.0,
@@ -13,47 +15,53 @@ const VideoTypes = [
     }
   },
   {
-    "name": "VR 180 (2D)",
+    "name": "VR 180 (2D) 柱狀",
+    "method": "createCylinderLayer",
     "config": {
       "centralAngle": Math.PI,
       "aspectRatio": 1.0,
       "layout": "mono"
     }
   },
+  // {
+  //   "name": "VR 3D 360 (Top-Bottom) 柱狀",
+  //   "method": "createCylinderLayer",
+  //   "config": {
+  //     "centralAngle": Math.PI * 2,
+  //     "aspectRatio": 1.0,
+  //     "layout": "stereo-top-bottom"
+  //   }
+  // },
+  // {
+  //   "name": "VR 3D 360 (Left-Right) 柱狀",
+  //   "method": "createCylinderLayer",
+  //   "config": {
+  //     "centralAngle": Math.PI * 2,
+  //     "aspectRatio": 2.0,
+  //     "layout": "stereo-left-right"
+  //   }
+  // },
+  // {
+  //   "name": "VR 3D 180 (Top-Bottom) 柱狀",
+  //   "method": "createCylinderLayer",
+  //   "config": {
+  //     "centralAngle": Math.PI,
+  //     "aspectRatio": 1.0,
+  //     "layout": "stereo-top-bottom"
+  //   }
+  // },
+  // {
+  //   "name": "VR 3D 180 (Left-Right) 柱狀",
+  //   "method": "createCylinderLayer",
+  //   "config": {
+  //     "centralAngle": Math.PI,
+  //     "aspectRatio": 2.0,
+  //     "layout": "stereo-left-right"
+  //   }
+  // },
   {
-    "name": "VR 3D 360 (Top-Bottom)",
-    "config": {
-      "centralAngle": Math.PI * 2,
-      "aspectRatio": 1.0,
-      "layout": "stereo-top-bottom"
-    }
-  },
-  {
-    "name": "VR 3D 360 (Left-Right)",
-    "config": {
-      "centralAngle": Math.PI * 2,
-      "aspectRatio": 2.0,
-      "layout": "stereo-left-right"
-    }
-  },
-  {
-    "name": "VR 3D 180 (Top-Bottom)",
-    "config": {
-      "centralAngle": Math.PI,
-      "aspectRatio": 1.0,
-      "layout": "stereo-top-bottom"
-    }
-  },
-  {
-    "name": "VR 3D 180 (Left-Right)",
-    "config": {
-      "centralAngle": Math.PI,
-      "aspectRatio": 2.0,
-      "layout": "stereo-left-right"
-    }
-  },
-  {
-    "name": "VR 360 (2D - Cylinder Layer)",
+    "name": "VR 360 (2D - Cylinder Layer) 柱狀",
+    "method": "createCylinderLayer",
     "config": {
       "centralAngle": Math.PI * 2,
       "aspectRatio": 16.0 / 9.0,
@@ -61,14 +69,71 @@ const VideoTypes = [
     }
   },
   {
-    "name": "VR 180 (2D - Cylinder Layer)",
+    "name": "VR 180 (2D - Cylinder Layer) 柱狀",
+    "method": "createCylinderLayer",
     "config": {
       "centralAngle": Math.PI,
       "aspectRatio": 16.0 / 9.0,
       "layout": "mono"
     }
-  }
+  },
+  {
+    name: "VR 360 (2D 单眼) 等距",
+    method: "createEquirectLayer",
+    config: {
+      centralHorizontalAngle: 2 * Math.PI,
+      radius: 1,
+      layout: "mono"
+    }
+  },
+  {
+    name: "VR 180 (2D 单眼) 等距",
+    method: "createEquirectLayer",
+    config: {
+      centralHorizontalAngle: Math.PI,
+      radius: 1,
+      layout: "mono"
+    }
+  },
+  // {
+  //   name: "VR 360 (3D 上下立体) 等距",
+  //   method: "createEquirectLayer",
+  //   config: {
+  //     centralHorizontalAngle: 2 * Math.PI,
+  //     radius: 1,
+  //     layout: "stereo-top-bottom"
+  //   }
+  // },
+  // {
+  //   name: "VR 360 (3D 左右立体) 等距",
+  //   method: "createEquirectLayer",
+  //   config: {
+  //     centralHorizontalAngle: 2 * Math.PI,
+  //     radius: 1,
+  //     layout: "stereo-left-right"
+  //   }
+  // },
+  // {
+  //   name: "VR 180 (3D 上下立体) 等距",
+  //   method: "createEquirectLayer",
+  //   config: {
+  //     centralHorizontalAngle: Math.PI,
+  //     radius: 1,
+  //     layout: "stereo-top-bottom"
+  //   }
+  // },
+  // {
+  //   name: "VR 180 (3D 左右立体) 等距",
+  //   method: "createEquirectLayer",
+  //   config: {
+  //     centralHorizontalAngle: Math.PI,
+  //     radius: 1,
+  //     layout: "stereo-left-right"
+  //   }
+  // },
 ];
+
+
 
 interface VRPlayerProps {
 }
@@ -218,62 +283,52 @@ const VRPlayer: React.FC<VRPlayerProps> = ({}) => {
       console.error('视频播放错误:', error);
     }
   };
-  const handleStart = () => {
+  const handleStart = async () => {
     setUserInteracted(true);
     setVideoError(null);
+
+    try {
+
+      if (!videoRef.current) throw new Error("影片元素不存在");
+      const videoElement = videoRef.current;
+      
+      // videoElement.src = VIDEO_URL;
+      // videoElement.load();
+      
+      const xrSession = await navigator.xr?.requestSession("immersive-vr", { optionalFeatures: ["layers"] });
+      if (!xrSession) throw new Error("不支援 WebXR");
+      const xrSpace = await xrSession?.requestReferenceSpace("local");
+      if (!xrSpace) throw new Error("不支援 WebXR");
+      const xrMediaFactory = new XRMediaBinding(xrSession);
+      const layerConfig = {space: xrSpace, ...videoType.config};
+      const xrLayer = (videoType.method === 'createCylinderLayer') ? 
+        xrMediaFactory.createCylinderLayer(videoElement, layerConfig) :
+        xrMediaFactory.createEquirectLayer(videoElement, layerConfig);
+      xrSession.updateRenderState({ layers: [xrLayer] });
+      const renderLoop = (time: DOMHighResTimeStamp, frame: XRFrame) => {
+        frame.session.requestAnimationFrame(renderLoop);
+      };
+      xrSession.requestAnimationFrame(renderLoop);
+      await videoElement.play();
+      // await videoElement.pause();
+      // videoElement.currentTime = 0;
+
+    } catch (error: any) {
+      console.error('错误:', error);
+      setVideoError(`错误: ${error?.message ?? '未知错误'}`);
+    }
   
-    navigator.xr?.requestSession("immersive-vr", { optionalFeatures: ["layers"] }) // ✅ 啟用 WebXR Layers
-      .then(async (xrSession: XRSession) => {
-        if (!videoRef.current) return;
-  
-        const videoElement = videoRef.current;
-        videoElement.src = "/videos/demo.mp4";
-        videoElement.load();
-  
-        await videoElement.play(); // 確保影片在用戶互動後播放
-  
-        // **請求 XR 空間**
-        xrSession.requestReferenceSpace("local").then((xrSpace:any) => { // ✅ 使用 'local' 參考空間
-          try {
-            let xrMediaFactory = new XRMediaBinding(xrSession);
-            let layer = xrMediaFactory.createCylinderLayer(videoElement, { 
-              space: xrSpace,  // ✅ 這裡改成獲取的 XRSpace
-              layout: videoType.config.layout,   // ✅ 使用適當的影片格式
-              aspectRatio: videoType.config.aspectRatio, // ✅ 使用適當的影片格式
-              centralAngle: videoType.config.centralAngle, // ✅ 使用適當的影片格式
-            });
-  
-            xrSession.updateRenderState({ layers: [layer] });
-  
-            // 確保 WebXR 會持續渲染
-            const renderLoop = (time: DOMHighResTimeStamp, frame: XRFrame) => {
-              xrSession.updateRenderState({ layers: [layer] });
-              xrSession.requestAnimationFrame(renderLoop);
-            };
-            xrSession.requestAnimationFrame(renderLoop);
-  
-            videoElement.play().catch((error) => {
-              setVideoError(`播放错误: ${error.message}`);
-            });
-  
-          } catch (error) {
-            setVideoError(`播放错误: XRMediaBinding 失敗: ${(error as Error).message}`);
-          }
-        });
-  
-      })
-      .catch((error: Error) => setVideoError(`播放错误: 不支援 WebXR 播放: ${error.message}`));
   };
   
 
   return (
-    <div className='w-dvw h-dvh flex flex-col items-center justify-center bg-blue-500'>
+    <div className='w-dvw h-dvh flex flex-col items-center justify-center bg-black'>
       <video
         ref={videoRef}
         crossOrigin="anonymous"
-        playsInline
-        src="/videos/drug_injected.mp4"
         controls
+        playsInline
+        src={VIDEO_URL} 
         onError={(e) => {
           const error = (e.target as HTMLVideoElement).error;
           setVideoError(`视频加载错误: ${error?.message}`);
@@ -281,7 +336,7 @@ const VRPlayer: React.FC<VRPlayerProps> = ({}) => {
         onLoadedData={() => setVideoError(null)}
       />
       {!userInteracted && (
-      <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center bg-black bg-opacity-50">
+      <div className="absolute top-0 left-0 w-full h-1/2 flex flex-col items-center justify-center bg-black bg-opacity-50">
 
         <div className="bg-white p-4 rounded-lg flex flex-col items-center space-y-4">
         
@@ -330,7 +385,7 @@ const VRPlayer: React.FC<VRPlayerProps> = ({}) => {
       </div>
       )}
       {videoError && (
-      <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-red-500">
+      <div className="w-full flex items-center justify-center text-red-500">
         {videoError}
       </div>
       )}

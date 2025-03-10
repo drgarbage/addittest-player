@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "addittest-player"
+    "default": "addittest-player",
+    "staging": "addittest-player-staging"
   }
 }

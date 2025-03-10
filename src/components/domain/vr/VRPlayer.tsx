@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { set } from 'firebase/database';
 import { setDoc, updateDoc, watchDoc } from '~/lib/firebase';
 import { SHA256 } from 'crypto-js';
 import { VideoTypes } from './VideoTypes';

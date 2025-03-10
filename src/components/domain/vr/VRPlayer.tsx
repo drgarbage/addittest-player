@@ -3,6 +3,7 @@ import { set } from 'firebase/database';
 import { setDoc, updateDoc, watchDoc } from '~/lib/firebase';
 import { SHA256 } from 'crypto-js';
 import { VideoTypes } from './VideoTypes';
+import Hls from 'hls.js'; // Import Hls.js
 
 interface VRPlayerProps {
   src: string;
@@ -69,6 +70,23 @@ const VRPlayer: React.FC<VRPlayerProps> = ({src}) => {
     });
     return () => unsubscribe();
   }, [pinCode, userInteracted]);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(src);
+        hls.attachMedia(videoRef.current);
+        hls.on(Hls.Events.ERROR, (event, data) => {
+          setVideoError(`HLS 错误: ${data.details}`);
+        });
+      } else if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
+        videoRef.current.src = src;
+      } else {
+        setVideoError('HLS 不受支持');
+      }
+    }
+  }, [src]);
 
   const handlePlaybackCommand = async (command: string, sessionRef: any) => {
     try {
@@ -167,7 +185,6 @@ const VRPlayer: React.FC<VRPlayerProps> = ({src}) => {
         crossOrigin="anonymous"
         controls
         playsInline
-        src={src} 
         onError={(e) => {
           const error = (e.target as HTMLVideoElement).error;
           setVideoError(`视频加载错误: ${error?.message}`);
@@ -175,8 +192,8 @@ const VRPlayer: React.FC<VRPlayerProps> = ({src}) => {
         onLoadedData={() => setVideoError(null)}
       />
       
-      {!userInteracted && (
-        <div className="absolute top-0 left-0 w-full h-1/2 flex flex-col items-center justify-center bg-black bg-opacity-50">
+      {!videoError && !userInteracted && (
+        <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center bg-black bg-opacity-50">
 
           <div className="bg-white p-4 rounded-lg flex flex-col items-center space-y-4">
           

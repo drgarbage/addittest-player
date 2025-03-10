@@ -2,7 +2,7 @@ import { FirebaseApp, initializeApp } from 'firebase/app';
 import { getAuth, Auth, connectAuthEmulator } from 'firebase/auth';
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 import { connectStorageEmulator, getStorage } from "firebase/storage";
-import { connectDatabaseEmulator, getDatabase } from 'firebase/database';
+import { connectDatabaseEmulator, getDatabase, ref, onValue, set, Unsubscribe, DatabaseReference, update } from 'firebase/database';
 
 let firebaseApp: FirebaseApp;
 const useEmulator = () => import.meta.env.VITE_USE_FIREBASE_EMULATOR;
@@ -65,3 +65,23 @@ export const useDatabase = () => {
   }
   return database;
 };
+
+export const setDoc = async (index: string, data: any) => {
+  const db = useDatabase();
+  const docRef = ref(db, `sessions/${index}`);
+  await set(docRef, data);
+}
+
+export const updateDoc = async (index: string, changes: any) => {
+  const db = useDatabase();
+  const docRef = ref(db, `sessions/${index}`);
+  await update(docRef, changes);
+}
+
+export const watchDoc = (index: string, callback: (ref: DatabaseReference, data: any) => void): Unsubscribe => {
+  const db = useDatabase();
+  const docRef = ref(db, `sessions/${index}`);
+  return onValue(docRef, (snapshot) => {
+    callback(docRef, snapshot.val());
+  });
+}

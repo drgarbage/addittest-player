@@ -2,6 +2,7 @@ import { Dialog } from '@headlessui/react';
 import { lazy, Suspense, useState } from 'react';
 import { Outlet, RouteObject, useRoutes, BrowserRouter, Routes, Route } from 'react-router-dom';
 import Player from '../screens/player';
+import Links from '../screens/links';
 
 const Loading = () => <p className="p-4 w-full h-full text-center">Loading...</p>;
 
@@ -23,6 +24,7 @@ export const Router: React.FC = () => {
           <Route path="*" element={<Page404Screen />} />
         </Route>
         <Route path="/player" element={<Player />} />
+        <Route path="/links" element={<Links />} />
       </Routes>
     </BrowserRouter>
   );

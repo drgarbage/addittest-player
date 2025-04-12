@@ -1,0 +1,11 @@
+services:
+  addit-test:
+    image: node:18      # 更新為 Node.js 18 的官方映像
+    container_name: addit-test
+    volumes:
+      - .:/app          # 將當前目錄掛載到容器的 /app 目錄
+      - /app/node_modules # 確保 node_modules 不會被本地覆蓋
+    working_dir: /app   # 設置工作目錄為 /app
+    ports:
+      - "3000:3000"     # 映射端口，假設您的應用在容器中運行於 3000 端口
+    command: sh -c "yarn install && yarn dev"  # 容器啟動後執行的命令

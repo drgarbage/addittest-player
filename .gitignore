@@ -3,3 +3,8 @@ node_modules
 dist
 dist-ssr
 *.local
+public/videos
+*.pem
+*.cache
+.env.local
+cert

@@ -5,7 +5,7 @@ export const VideoTypes = [
     config: {
       centralHorizontalAngle: 2 * Math.PI,
       radius: 1,
-      layout: "mono"
+      layout: "mono" as XRLayerLayout
     }
   },
   {
@@ -14,7 +14,7 @@ export const VideoTypes = [
     "config": {
       "centralAngle": Math.PI * 2,
       "aspectRatio": 2.0,
-      "layout": "mono"
+      "layout": "mono" as XRLayerLayout
     }
   },
   {
@@ -23,7 +23,7 @@ export const VideoTypes = [
     "config": {
       "centralAngle": Math.PI * 2,
       "aspectRatio": 16.0 / 9.0,
-      "layout": "mono"
+      "layout": "mono" as XRLayerLayout
     }
   },
 ];
